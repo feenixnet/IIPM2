@@ -75,15 +75,15 @@ if ($member && $member->qualification_date) {
 }
 
 // Get user meta for address
-$address_line1 = get_user_meta($user_id, 'address_line1', true) ?: '';
-$address_line2 = get_user_meta($user_id, 'address_line2', true) ?: '';
-$city = get_user_meta($user_id, 'city', true) ?: '';
-$county = get_user_meta($user_id, 'county', true) ?: '';
-$eircode = get_user_meta($user_id, 'eircode', true) ?: '';
+// $address_line1 = get_user_meta($user_id, 'address_line1', true) ?: '';
+// $address_line2 = get_user_meta($user_id, 'address_line2', true) ?: '';
+// $city = get_user_meta($user_id, 'city', true) ?: '';
+// $county = get_user_meta($user_id, 'county', true) ?: '';
+// $eircode = get_user_meta($user_id, 'eircode', true) ?: '';
 
-// Format address
-$full_address = array_filter(array($address_line1, $address_line2, $city, $county, $eircode));
-$address_display = implode("\n", $full_address);
+// // Format address
+// $full_address = array_filter(array($address_line1, $address_line2, $city, $county, $eircode));
+// $address_display = implode("\n", $full_address);
 
 get_header();
 ?>
@@ -236,16 +236,6 @@ get_header();
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label>Mobile</label>
-                                            <div class="form-value" data-field="work_mobile">
-                                                <?php if ($profile->work_mobile): ?>
-                                                    <?php echo esc_html($profile->work_mobile); ?>
-                                                <?php else: ?>
-                                                    <span class="placeholder-text">Not provided</span>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
                                             <label>E-mail</label>
                                             <div class="form-value" data-field="work_email">
                                                 <?php if ($profile->work_email): ?>
@@ -282,10 +272,6 @@ get_header();
                                             <input type="text" class="form-input" name="user_mobile" value="<?php echo esc_attr($profile->user_mobile); ?>" />
                                         </div>
                                         <div class="form-group">
-                                            <label>Mobile</label>
-                                            <input type="text" class="form-input" name="work_mobile" value="<?php echo esc_attr($profile->work_mobile); ?>" />
-                                        </div>
-                                        <div class="form-group">
                                             <label>E-mail</label>
                                             <input type="email" class="form-input" name="work_email" value="<?php echo esc_attr($profile->work_email); ?>" />
                                         </div>
@@ -304,7 +290,7 @@ get_header();
                             </button>
                         </div>
                         <div class="section-content" id="address">
-                            <div class="view-mode">
+                            <!-- <div class="view-mode">
                                 <div class="form-group">
                                     <label>Address*</label>
                                     <div class="form-value address-value" data-field="address">
@@ -337,7 +323,7 @@ get_header();
                                     <label>Eircode</label>
                                     <input type="text" class="form-input" name="eircode" value="<?php echo esc_attr($eircode); ?>" />
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
@@ -361,7 +347,7 @@ get_header();
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label>Employer Address*</label>
                                     <div class="form-value address-value" data-field="employer_address">
                                         <?php if ($profile->employer_address_line1): ?>
@@ -379,14 +365,14 @@ get_header();
                                             <span class="placeholder-text">No employer address information on file</span>
                                         <?php endif; ?>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="edit-mode" style="display: none;">
                                 <div class="form-group">
                                     <label>Employer Name*</label>
                                     <input type="text" class="form-input" name="employer_name" value="<?php echo esc_attr($profile->employer_name); ?>" />
                                 </div>
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label>Employer Address Line 1*</label>
                                     <input type="text" class="form-input" name="employer_address_line1" value="<?php echo esc_attr($profile->employer_address_line1); ?>" />
                                 </div>
@@ -405,7 +391,7 @@ get_header();
                                 <div class="form-group">
                                     <label>Employer Eircode</label>
                                     <input type="text" class="form-input" name="employer_eircode" value="<?php echo esc_attr($profile->employer_eircode); ?>" />
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -2168,7 +2154,6 @@ get_header();
         margin-top: 0;
         margin-left: 8px;
     }
-}
     
     .profile-main {
         padding: 20px;
@@ -2204,6 +2189,7 @@ get_header();
     .table-cell:nth-child(4) {
         display: none;
     }
+
 }
 
 @media (max-width: 768px) and (min-width: 481px) {
@@ -2675,20 +2661,20 @@ function updateViewMode(sectionId) {
         });
     } else if (sectionId === 'address') {
         // Update address view
-        const addressLine1 = section.querySelector('input[name="address_line1"]').value;
-        const addressLine2 = section.querySelector('input[name="address_line2"]').value;
-        const city = section.querySelector('input[name="city"]').value;
-        const county = section.querySelector('input[name="county"]').value;
-        const eircode = section.querySelector('input[name="eircode"]').value;
+        // const addressLine1 = section.querySelector('input[name="address_line1"]').value;
+        // const addressLine2 = section.querySelector('input[name="address_line2"]').value;
+        // const city = section.querySelector('input[name="city"]').value;
+        // const county = section.querySelector('input[name="county"]').value;
+        // const eircode = section.querySelector('input[name="eircode"]').value;
         
-        const addressField = viewMode.querySelector('[data-field="address"]');
-        const addressParts = [addressLine1, addressLine2, city, county, eircode].filter(Boolean);
+        // const addressField = viewMode.querySelector('[data-field="address"]');
+        // const addressParts = [addressLine1, addressLine2, city, county, eircode].filter(Boolean);
         
-        if (addressParts.length > 0) {
-            addressField.innerHTML = addressParts.join('<br>');
-        } else {
-            addressField.innerHTML = '<span class="placeholder-text">No address information on file</span>';
-        }
+        // if (addressParts.length > 0) {
+        //     addressField.innerHTML = addressParts.join('<br>');
+        // } else {
+        //     addressField.innerHTML = '<span class="placeholder-text">No address information on file</span>';
+        // }
     } else if (sectionId === 'employment') {
         // Update employment view
         const employerNameInput = section.querySelector('input[name="employer_name"]');
@@ -2703,20 +2689,20 @@ function updateViewMode(sectionId) {
         }
         
         // Update employer address
-        const line1 = section.querySelector('input[name="employer_address_line1"]').value;
-        const line2 = section.querySelector('input[name="employer_address_line2"]').value;
-        const empCity = section.querySelector('input[name="employer_city"]').value;
-        const empCounty = section.querySelector('input[name="employer_county"]').value;
-        const empEircode = section.querySelector('input[name="employer_eircode"]').value;
+        // const line1 = section.querySelector('input[name="employer_address_line1"]').value;
+        // const line2 = section.querySelector('input[name="employer_address_line2"]').value;
+        // const empCity = section.querySelector('input[name="employer_city"]').value;
+        // const empCounty = section.querySelector('input[name="employer_county"]').value;
+        // const empEircode = section.querySelector('input[name="employer_eircode"]').value;
         
-        const empAddressField = viewMode.querySelector('[data-field="employer_address"]');
-        const empAddressParts = [line1, line2, empCity, empCounty, empEircode].filter(Boolean);
+        // const empAddressField = viewMode.querySelector('[data-field="employer_address"]');
+        // const empAddressParts = [line1, line2, empCity, empCounty, empEircode].filter(Boolean);
         
-        if (empAddressParts.length > 0) {
-            empAddressField.innerHTML = empAddressParts.join('<br>');
-        } else {
-            empAddressField.innerHTML = '<span class="placeholder-text">No employer address information on file</span>';
-        }
+        // if (empAddressParts.length > 0) {
+        //     empAddressField.innerHTML = empAddressParts.join('<br>');
+        // } else {
+        //     empAddressField.innerHTML = '<span class="placeholder-text">No employer address information on file</span>';
+        // }
     }
 }
 

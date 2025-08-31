@@ -983,11 +983,15 @@ function iipm_process_organisation_admin_registration($data, $invitation) {
         array(
             'user_id' => $user_id,
             'user_phone' => sanitize_text_field($data['user_phone'] ?? ''),
-            'work_email' => sanitize_email($data['work_email'] ?? ''),
+            'email_address' => sanitize_email($data['work_email'] ?? ''),
             'user_mobile' => sanitize_text_field($data['user_mobile'] ?? ''),
-            'employer_name' => sanitize_text_field($data['employer_name'] ?? '')
+            'employer_name' => sanitize_text_field($data['employer_name'] ?? ''),
+            'is_admin' => 1,
+            'dateOfUpdatePers' => current_time('mysql'),
+            'dateOfUpdateGen' => current_time('mysql'),
+            'employerDetailsUpdated' => current_time('mysql'),
         ),
-        array('%d', '%s', '%s', '%s', '%s')
+        array('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
     );
     
     // Mark invitation as used

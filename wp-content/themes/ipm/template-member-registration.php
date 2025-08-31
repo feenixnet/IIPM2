@@ -50,7 +50,7 @@ get_header();
                         <?php endif; ?>
                         
                         <!-- Add hidden input for member type -->
-                        <input type="hidden" name="member_type" value="individual">
+                        <input type="hidden" name="member_type" value="<?php $is_organisation = $invitation->organisation_id ? 'organisation' : 'individual'; echo $is_organisation; ?>">
                         
                         <!-- Personal Information Section -->
                         <div class="form-section">
@@ -135,12 +135,6 @@ get_header();
                                 <label for="user_designation">User Designation</label>
                                 <input type="text" name="user_designation" id="user_designation" 
                                        placeholder="e.g., QFA, CPA, etc.">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="other_qualifications">Other Qualifications</label>
-                                <textarea name="other_qualifications" id="other_qualifications" rows="3" 
-                                          placeholder="Please include other accreditations and date obtained (e.g., QFA 15.06.2012)"></textarea>
                             </div>
                         </div>
 
@@ -1452,6 +1446,11 @@ jQuery(document).ready(function($){
     display: inline-block;
 }
 
+.form-section:first-of-type .form-group {
+  max-width: 100% !important;
+  margin: 0 0 25px 0 !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .enhanced-success-message {
@@ -1479,6 +1478,9 @@ jQuery(document).ready(function($){
         font-size: 12px;
     }
 }
+
+
+
 </style>
 </div>
 </main>

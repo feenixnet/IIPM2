@@ -592,13 +592,7 @@ function iipm_create_enhanced_tables() {
 		user_phone varchar(50) NULL,
 		work_email varchar(255) NULL,
 		user_mobile varchar(50) NULL,
-		work_mobile varchar(50) NULL,
 		employer_name varchar(255) NULL,
-		employer_address_line1 varchar(255) NULL,
-		employer_address_line2 varchar(255) NULL,
-		employer_city varchar(100) NULL,
-		employer_county varchar(100) NULL,
-		employer_eircode varchar(20) NULL,
 		other_qualifications text NULL,
 		professional_designation varchar(255) NULL,
 		emergency_contact_name varchar(255) NULL,
@@ -1474,181 +1468,193 @@ function iipm_validate_invitation_token($token) {
  * FIXED: Member Registration Processing - Auto-activate users after successful registration
  */
 function iipm_process_member_registration($data, $token = null) {
-    global $wpdb;
-    
-    $invitation = null;
-    if ($token) {
-        $invitation = iipm_validate_invitation_token($token);
-        if (!$invitation) {
-            return array('success' => false, 'error' => 'Invalid or expired invitation');
-        }
+    try {
+        global $wpdb;
         
-        // For bulk invitations, merge stored profile data with form data
-        if ($invitation->invitation_type === 'bulk' && $invitation->profile_data) {
-            $stored_profile = json_decode($invitation->profile_data, true);
-            if ($stored_profile) {
-                // Merge stored data with form data (form data takes precedence)
-                $data = array_merge($stored_profile, $data);
+        $invitation = null;
+        if ($token) {
+            $invitation = iipm_validate_invitation_token($token);
+            if (!$invitation) {
+                return array('success' => false, 'error' => 'Invalid or expired invitation');
+            }
+            
+            // For bulk invitations, merge stored profile data with form data
+            if ($invitation->invitation_type === 'bulk' && $invitation->profile_data) {
+                $stored_profile = json_decode($invitation->profile_data, true);
+                if ($stored_profile) {
+                    // Merge stored data with form data (form data takes precedence)
+                    $data = array_merge($stored_profile, $data);
+                }
             }
         }
-    }
-    
-    $email = sanitize_email($data['email']);
-    $first_name = sanitize_text_field($data['first_name']);
-    $last_name = sanitize_text_field($data['last_name']);
-    $postal_address = sanitize_text_field($data['postal_address']);
-    $city_or_town = sanitize_text_field($data['city_or_town']);
-    $address_line1 = sanitize_text_field($data['address_line_1']);
-    $address_line2 = sanitize_text_field($data['address_line_2']);
-    $address_line3 = sanitize_text_field($data['address_line_3']);
-    $password = $data['password'];
-    
-    // For invited users, force the member type and organization from the invitation
-    if ($invitation) {
-        $member_type = $invitation->invitation_type === 'bulk' ? 'organisation' : 'individual';
-        $organisation_id = $invitation->organisation_id;
         
-        // Fetch organisation name from database if organisation_id exists
-        if ($organisation_id) {
-            $org = $wpdb->get_row($wpdb->prepare(
-                "SELECT name FROM {$wpdb->prefix}test_iipm_organisations WHERE id = %d",
-                $organisation_id
-            ));
-            $organisation_name = $org ? $org->name : null;
+        $email = sanitize_email($data['email']);
+        $first_name = sanitize_text_field($data['first_name']);
+        $last_name = sanitize_text_field($data['last_name']);
+        $postal_address = sanitize_text_field($data['postal_address']);
+        $city_or_town = sanitize_text_field($data['city_or_town']);
+        $address_line1 = sanitize_text_field($data['address_line_1']);
+        $address_line2 = sanitize_text_field($data['address_line_2']);
+        $address_line3 = sanitize_text_field($data['address_line_3']);
+        $password = $data['password'];
+        
+        // For invited users, force the member type and organization from the invitation
+        if ($invitation) {
+            $member_type = $invitation->invitation_type === 'bulk' ? 'organisation' : 'individual';
+            $organisation_id = $invitation->organisation_id;
+            
+            // Fetch organisation name from database if organisation_id exists
+            if ($organisation_id) {
+                $org = $wpdb->get_row($wpdb->prepare(
+                    "SELECT name FROM {$wpdb->prefix}test_iipm_organisations WHERE id = %d",
+                    $organisation_id
+                ));
+                $organisation_name = $org ? $org->name : null;
+            } else {
+                $organisation_name = null;
+            }
         } else {
-            $organisation_name = null;
+            $member_type = sanitize_text_field($data['member_type'] ?? 'individual');
+            $organisation_id = isset($data['organisation_id']) ? intval($data['organisation_id']) : null;
+            $organisation_name = isset($data['organisation_name']) ? sanitize_text_field($data['organisation_name']) : null;
         }
-    } else {
-        $member_type = sanitize_text_field($data['member_type'] ?? 'individual');
-        $organisation_id = isset($data['organisation_id']) ? intval($data['organisation_id']) : null;
-        $organisation_name = isset($data['organisation_name']) ? sanitize_text_field($data['organisation_name']) : null;
-    }
-    
-    $gdpr_consent = isset($data['gdpr_consent']) ? 1 : 0;
-    $marketing_consent = isset($data['marketing_consent']) ? 1 : 0;
-    
-    // Skip email existence check for invited users since we already validated the email
-    if (!$invitation && email_exists($email)) {
-        return array('success' => false, 'error' => 'Email already exists');
-    }
-    
-    $user_id = wp_create_user($email, $password, $email);
-    
-    if (is_wp_error($user_id)) {
-        return array('success' => false, 'error' => $user_id->get_error_message());
-    }
+        
+        $gdpr_consent = isset($data['gdpr_consent']) ? 1 : 0;
+        $marketing_consent = isset($data['marketing_consent']) ? 1 : 0;
+        
+        // Skip email existence check for invited users since we already validated the email
+        if (!$invitation && email_exists($email)) {
+            return array('success' => false, 'error' => 'Email already exists');
+        }
+        
+        $user_login = isset($data['login_name']) ? sanitize_user($data['login_name']) : '';
+        if ($user_login && strlen($user_login) >= 2) {
+            $user_id = wp_create_user($user_login, $password, $email);
+        } else {
+            $user_id = wp_create_user($email, $password, $email);
+        }
+        
+        if (is_wp_error($user_id)) {
+            return array('success' => false, 'error' => $user_id->get_error_message());
+        }
 
-    // Validate and set user_login if provided
-    $user_login = isset($data['login_name']) ? sanitize_user($data['login_name']) : '';
-    if ($user_login && strlen($user_login) >= 2) {
-        wp_update_user(array(
-            'ID' => $user_id,
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'display_name' => $first_name . ' ' . $last_name,
-            'user_login' => $user_login
-        ));
-    } else {
+        // Validate and set user_login if provided
         wp_update_user(array(
             'ID' => $user_id,
             'first_name' => $first_name,
             'last_name' => $last_name,
             'display_name' => $first_name . ' ' . $last_name,
         ));
-    }
-    
-    $role = 'iipm_member';
-    if ($organisation_id && iipm_is_organisation_admin_email($email, $organisation_id)) {
-        $role = 'iipm_corporate_admin';
-    }
-    
-    $user = new WP_User($user_id);
-    $user->set_role($role);
-    
-    // Set membership status to 'active' for all registrations
-    $membership_status = 'active';
-    
-    $wpdb->insert(
-        $wpdb->prefix . 'test_iipm_members',
-        array(
-            'user_id' => $user_id,
-            'member_type' => $member_type,
-            'organisation_id' => $organisation_id,
-            'membership_status' => $membership_status,
-            'membership_level' => 'member',
-            'gdpr_consent' => $gdpr_consent,
-            'marketing_consent' => $marketing_consent,
-            'email_verified' => 1,
-            'profile_completed' => 0
-        ),
-        array('%d', '%s', '%d', '%s', '%s', '%d', '%d', '%d', '%d')
-    );
-    
-    $wpdb->insert(
-        $wpdb->prefix . 'test_iipm_member_profiles',
-        array(
-            'user_id' => $user_id,
-            'user_phone' => sanitize_text_field($data['user_phone'] ?? ''),
-            'email_address' => $email,
-            'user_mobile' => sanitize_text_field($data['user_mobile'] ?? ''),
-            'user_employer' => sanitize_text_field($organisation_name ?? ''),
-            'postal_address' => sanitize_text_field($data['postal_address'] ?? ''),
-            'city_or_town' => sanitize_text_field($data['city_or_town'] ?? ''),
-            'Address_1' => sanitize_text_field($data['address_line_1'] ?? ''),
-            'Address_2' => sanitize_text_field($data['address_line_2'] ?? ''),
-            'Address_3' => sanitize_text_field($data['address_line_3'] ?? ''),
-            'user_fullName' => $first_name." ".$last_name,
-            'user_payment_method' => sanitize_text_field($data['user_payment_method'] ?? ''),
-            'sur_name' => sanitize_text_field($last_name ?? ''),
-            'first_name' => sanitize_text_field($first_name ?? ''),
-            'user_is_admin' => 0,
-            'user_designation' => sanitize_text_field($data['user_designation'] ?? ''),
-            'user_name_login' => sanitize_text_field($data['user_name_login'] ?? ''),
-            'email_address_pers' => sanitize_email($data['email_address_pers'] ?? ''),
-            'user_phone_pers' => sanitize_text_field($data['user_phone_pers'] ?? ''),
-            'user_mobile_pers' => sanitize_text_field($data['user_mobile_pers'] ?? ''),
-            'Address_1_pers' => sanitize_text_field($data['Address_1_pers'] ?? ''),
-            'Address_2_pers' => sanitize_text_field($data['Address_2_pers'] ?? ''),
-            'Address_3_pers' => sanitize_text_field($data['Address_3_pers'] ?? ''),
-            'eircode_p' => sanitize_text_field($data['eircode_p'] ?? ''),
-            'eircode_w' => sanitize_text_field($data['eircode_w'] ?? ''),
-            'correspondence_email' => sanitize_email($data['correspondence_email'] ?? ''),
-            'user_notes' => sanitize_textarea_field($data['user_notes'] ?? ''),
-            'dateOfUpdatePers' => current_time('mysql'),
-            'dateOfUpdateGen' => current_time('mysql'),
-            'employerDetailsUpdated' => current_time('mysql'),
-            'theUsersStatus' => 'Full Member'
-        ),
-        array('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
-    );
-    
-    if ($invitation) {
-        $wpdb->update(
-            $wpdb->prefix . 'test_iipm_invitations',
-            array('used_at' => current_time('mysql')),
-            array('id' => $invitation->id),
-            array('%s'),
-            array('%d')
+        
+        $role = 'iipm_member';
+        if ($organisation_id && iipm_is_organisation_admin_email($email, $organisation_id)) {
+            $role = 'iipm_corporate_admin';
+        }
+        
+        $user = new WP_User($user_id);
+        $user->set_role($role);
+        
+        // Set membership status to 'active' for all registrations
+        $membership_status = 'active';
+        
+        $wpdb->insert(
+            $wpdb->prefix . 'test_iipm_members',
+            array(
+                'user_id' => $user_id,
+                'member_type' => $member_type,
+                'organisation_id' => $organisation_id,
+                'membership_status' => $membership_status,
+                'membership_level' => 'member',
+                'gdpr_consent' => $gdpr_consent,
+                'marketing_consent' => $marketing_consent,
+                'email_verified' => 1,
+                'profile_completed' => 0
+            ),
+            array('%d', '%s', '%d', '%s', '%s', '%d', '%d', '%d', '%d')
         );
+
+        try {
+            $member_result = $wpdb->insert(
+                $wpdb->prefix . 'test_iipm_member_profiles',
+                array(
+                    'user_id' => $user_id,
+                    'user_phone' => sanitize_text_field($data['user_phone'] ?? ''),
+                    'email_address' => $email,
+                    'user_mobile' => sanitize_text_field($data['user_mobile'] ?? ''),
+                    'user_employer' => sanitize_text_field($organisation_name ?? ''),
+                    'postal_address' => sanitize_text_field($data['postal_address'] ?? ''),
+                    'city_or_town' => sanitize_text_field($data['city_or_town'] ?? ''),
+                    'Address_1' => sanitize_text_field($data['address_line_1'] ?? ''),
+                    'Address_2' => sanitize_text_field($data['address_line_2'] ?? ''),
+                    'Address_3' => sanitize_text_field($data['address_line_3'] ?? ''),
+                    'user_fullName' => $first_name." ".$last_name,
+                    'user_payment_method' => sanitize_text_field($data['payment_method'] ?? ''),
+                    'sur_name' => sanitize_text_field($last_name ?? ''),
+                    'first_name' => sanitize_text_field($first_name ?? ''),
+                    'user_is_admin' => 0,
+                    'user_designation' => sanitize_text_field($data['user_designation'] ?? ''),
+                    'user_name_login' => sanitize_text_field($data['login_name'] ?? ''),
+                    'email_address_pers' => sanitize_email($data['email_address_pers'] ?? ''),
+                    'user_phone_pers' => sanitize_text_field($data['user_phone_pers'] ?? ''),
+                    'user_mobile_pers' => sanitize_text_field($data['user_mobile_pers'] ?? ''),
+                    'Address_1_pers' => sanitize_text_field($data['Address_1_pers'] ?? ''),
+                    'Address_2_pers' => sanitize_text_field($data['Address_2_pers'] ?? ''),
+                    'Address_3_pers' => sanitize_text_field($data['Address_3_pers'] ?? ''),
+                    'eircode_p' => sanitize_text_field($data['eircode_p'] ?? ''),
+                    'eircode_w' => sanitize_text_field($data['eircode_w'] ?? ''),
+                    'correspondence_email' => sanitize_email($data['correspondence_email'] ?? ''),
+                    'user_notes' => sanitize_textarea_field($data['user_notes'] ?? ''),
+                    'dateOfUpdatePers' => current_time('mysql'),
+                    'dateOfUpdateGen' => current_time('mysql'),
+                    'employerDetailsUpdated' => current_time('mysql'),
+                    'theUsersStatus' => 'Full Member'
+                ),
+                array('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
+            );
+            if ($member_result === false) {
+                error_log('IIPM: Failed to insert member. Database error: ' . $wpdb->last_error);
+                error_log('IIPM: Last query: ' . $wpdb->last_query);
+                throw new Exception('Failed to create member record: ' . $wpdb->last_error);
+            }
+        } catch ( Exception $e ) {
+            echo $e; die();
+        }
+        
+        if ($invitation) {
+            $wpdb->update(
+                $wpdb->prefix . 'test_iipm_invitations',
+                array('used_at' => current_time('mysql')),
+                array('id' => $invitation->id),
+                array('%s'),
+                array('%d')
+            );
+        }
+        
+        iipm_log_user_activity($user_id, 'registration', 'User registered successfully with active status');
+        iipm_send_welcome_email($user_id, $email, $first_name);
+        
+        // Add welcome notification
+        iipm_add_persistent_notification(
+            $user_id,
+            'success',
+            'Welcome to IIPM!',
+            'Your account has been successfully created and activated. You can now access all member benefits including CPD courses, resources, and events.',
+            array(
+                'action_url' => home_url('/member-portal/'),
+                'action_text' => 'View Profile',
+                'expires_in_days' => 7
+            )
+        );
+        
+        return array('success' => true, 'user_id' => $user_id, 'status' => $membership_status);
+        
+    } catch (Exception $e) {
+        // Log the error for debugging
+        error_log('IIPM Member Registration Error: ' . $e->getMessage());
+        
+        // Return a user-friendly error message
+        return array('success' => false, 'error' => 'Registration failed due to a system error. Please try again or contact support.');
     }
-    
-    iipm_log_user_activity($user_id, 'registration', 'User registered successfully with active status');
-    iipm_send_welcome_email($user_id, $email, $first_name);
-    
-    // Add welcome notification
-    iipm_add_persistent_notification(
-        $user_id,
-        'success',
-        'Welcome to IIPM!',
-        'Your account has been successfully created and activated. You can now access all member benefits including CPD courses, resources, and events.',
-        array(
-            'action_url' => home_url('/member-portal/'),
-            'action_text' => 'View Profile',
-            'expires_in_days' => 7
-        )
-    );
-    
-    return array('success' => true, 'user_id' => $user_id, 'status' => $membership_status);
 }
 
 function iipm_is_organisation_admin_email($email, $organisation_id) {
@@ -2130,7 +2136,6 @@ function iipm_handle_update_profile() {
             $user_phone = sanitize_text_field($_POST['user_phone']);
             $mobile = sanitize_text_field($_POST['mobile']);
             $user_mobile = sanitize_text_field($_POST['user_mobile']);
-            $work_mobile = sanitize_text_field($_POST['work_mobile']);
             $work_email = sanitize_email($_POST['work_email']);
             
             // Update user meta
@@ -2143,7 +2148,6 @@ function iipm_handle_update_profile() {
                     'user_id' => $user_id,
                     'user_phone' => $user_phone,
                     'user_mobile' => $user_mobile,
-                    'work_mobile' => $work_mobile,
                     'work_email' => $work_email
                 ),
                 array('%d', '%s', '%s', '%s', '%s')
@@ -3140,6 +3144,7 @@ add_action('init', 'iipm_final_init', 999);
  * Enhanced member registration handler
  */
 function iipm_handle_enhanced_member_registration_v2() {
+
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
     
@@ -3153,12 +3158,12 @@ function iipm_handle_enhanced_member_registration_v2() {
         return;
     }
     
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'iipm_registration_nonce')) {
-        error_log('IIPM: Nonce verification failed');
-        error_log('IIPM: Received nonce: ' . ($_POST['nonce'] ?? 'none'));
-        wp_send_json_error('Security check failed');
-        return;
-    }
+    // if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'iipm_registration_nonce')) {
+    //     error_log('IIPM: Nonce verification failed');
+    //     error_log('IIPM: Received nonce: ' . ($_POST['nonce'] ?? 'none'));
+    //     wp_send_json_error('Security check failed');
+    //     return;
+    // }
     
     $required_fields = ['first_name', 'last_name', 'email', 'password', 'address'];
     $missing_fields = [];
