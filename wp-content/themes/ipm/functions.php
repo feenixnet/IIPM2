@@ -589,9 +589,9 @@ function iipm_create_enhanced_tables() {
 	$sql_profiles = "CREATE TABLE $table_profiles (
 		id int(11) NOT NULL AUTO_INCREMENT,
 		user_id bigint(20) NOT NULL,
-		personal_phone varchar(50) NULL,
+		user_phone varchar(50) NULL,
 		work_email varchar(255) NULL,
-		work_phone varchar(50) NULL,
+		user_mobile varchar(50) NULL,
 		work_mobile varchar(50) NULL,
 		employer_name varchar(255) NULL,
 		employer_address_line1 varchar(255) NULL,
@@ -1024,9 +1024,9 @@ function iipm_process_bulk_import($file_path, $organisation_id, $options = array
 				'email' => sanitize_email($record['email']),
 				'member_type' => 'organisation',
 				'organisation_id' => $organisation_id,
-				'personal_phone' => sanitize_text_field($record['personal_phone'] ?? ''),
+				'user_phone' => sanitize_text_field($record['user_phone'] ?? ''),
 				'work_email' => sanitize_email($record['work_email'] ?? ''),
-				'work_phone' => sanitize_text_field($record['work_phone'] ?? ''),
+				'user_mobile' => sanitize_text_field($record['user_mobile'] ?? ''),
 				'employer_name' => sanitize_text_field($record['employer_name'] ?? ''),
 				'professional_designation' => sanitize_text_field($record['professional_designation'] ?? ''),
 				'gdpr_consent' => 1,
@@ -1496,15 +1496,32 @@ function iipm_process_member_registration($data, $token = null) {
     $email = sanitize_email($data['email']);
     $first_name = sanitize_text_field($data['first_name']);
     $last_name = sanitize_text_field($data['last_name']);
+    $postal_address = sanitize_text_field($data['postal_address']);
+    $city_or_town = sanitize_text_field($data['city_or_town']);
+    $address_line1 = sanitize_text_field($data['address_line_1']);
+    $address_line2 = sanitize_text_field($data['address_line_2']);
+    $address_line3 = sanitize_text_field($data['address_line_3']);
     $password = $data['password'];
     
     // For invited users, force the member type and organization from the invitation
     if ($invitation) {
         $member_type = $invitation->invitation_type === 'bulk' ? 'organisation' : 'individual';
         $organisation_id = $invitation->organisation_id;
+        
+        // Fetch organisation name from database if organisation_id exists
+        if ($organisation_id) {
+            $org = $wpdb->get_row($wpdb->prepare(
+                "SELECT name FROM {$wpdb->prefix}test_iipm_organisations WHERE id = %d",
+                $organisation_id
+            ));
+            $organisation_name = $org ? $org->name : null;
+        } else {
+            $organisation_name = null;
+        }
     } else {
         $member_type = sanitize_text_field($data['member_type'] ?? 'individual');
         $organisation_id = isset($data['organisation_id']) ? intval($data['organisation_id']) : null;
+        $organisation_name = isset($data['organisation_name']) ? sanitize_text_field($data['organisation_name']) : null;
     }
     
     $gdpr_consent = isset($data['gdpr_consent']) ? 1 : 0;
@@ -1520,13 +1537,25 @@ function iipm_process_member_registration($data, $token = null) {
     if (is_wp_error($user_id)) {
         return array('success' => false, 'error' => $user_id->get_error_message());
     }
-    
-    wp_update_user(array(
-        'ID' => $user_id,
-        'first_name' => $first_name,
-        'last_name' => $last_name,
-        'display_name' => $first_name . ' ' . $last_name,
-    ));
+
+    // Validate and set user_login if provided
+    $user_login = isset($data['login_name']) ? sanitize_user($data['login_name']) : '';
+    if ($user_login && strlen($user_login) >= 2) {
+        wp_update_user(array(
+            'ID' => $user_id,
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'display_name' => $first_name . ' ' . $last_name,
+            'user_login' => $user_login
+        ));
+    } else {
+        wp_update_user(array(
+            'ID' => $user_id,
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'display_name' => $first_name . ' ' . $last_name,
+        ));
+    }
     
     $role = 'iipm_member';
     if ($organisation_id && iipm_is_organisation_admin_email($email, $organisation_id)) {
@@ -1559,12 +1588,38 @@ function iipm_process_member_registration($data, $token = null) {
         $wpdb->prefix . 'test_iipm_member_profiles',
         array(
             'user_id' => $user_id,
-            'personal_phone' => sanitize_text_field($data['personal_phone'] ?? ''),
-            'work_email' => sanitize_email($data['work_email'] ?? ''),
-            'work_phone' => sanitize_text_field($data['work_phone'] ?? ''),
-            'employer_name' => sanitize_text_field($data['employer_name'] ?? '')
+            'user_phone' => sanitize_text_field($data['user_phone'] ?? ''),
+            'email_address' => $email,
+            'user_mobile' => sanitize_text_field($data['user_mobile'] ?? ''),
+            'user_employer' => sanitize_text_field($organisation_name ?? ''),
+            'postal_address' => sanitize_text_field($data['postal_address'] ?? ''),
+            'city_or_town' => sanitize_text_field($data['city_or_town'] ?? ''),
+            'Address_1' => sanitize_text_field($data['address_line_1'] ?? ''),
+            'Address_2' => sanitize_text_field($data['address_line_2'] ?? ''),
+            'Address_3' => sanitize_text_field($data['address_line_3'] ?? ''),
+            'user_fullName' => $first_name." ".$last_name,
+            'user_payment_method' => sanitize_text_field($data['user_payment_method'] ?? ''),
+            'sur_name' => sanitize_text_field($last_name ?? ''),
+            'first_name' => sanitize_text_field($first_name ?? ''),
+            'user_is_admin' => 0,
+            'user_designation' => sanitize_text_field($data['user_designation'] ?? ''),
+            'user_name_login' => sanitize_text_field($data['user_name_login'] ?? ''),
+            'email_address_pers' => sanitize_email($data['email_address_pers'] ?? ''),
+            'user_phone_pers' => sanitize_text_field($data['user_phone_pers'] ?? ''),
+            'user_mobile_pers' => sanitize_text_field($data['user_mobile_pers'] ?? ''),
+            'Address_1_pers' => sanitize_text_field($data['Address_1_pers'] ?? ''),
+            'Address_2_pers' => sanitize_text_field($data['Address_2_pers'] ?? ''),
+            'Address_3_pers' => sanitize_text_field($data['Address_3_pers'] ?? ''),
+            'eircode_p' => sanitize_text_field($data['eircode_p'] ?? ''),
+            'eircode_w' => sanitize_text_field($data['eircode_w'] ?? ''),
+            'correspondence_email' => sanitize_email($data['correspondence_email'] ?? ''),
+            'user_notes' => sanitize_textarea_field($data['user_notes'] ?? ''),
+            'dateOfUpdatePers' => current_time('mysql'),
+            'dateOfUpdateGen' => current_time('mysql'),
+            'employerDetailsUpdated' => current_time('mysql'),
+            'theUsersStatus' => 'Full Member'
         ),
-        array('%d', '%s', '%s', '%s', '%s')
+        array('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
     );
     
     if ($invitation) {
@@ -2072,9 +2127,9 @@ function iipm_handle_update_profile() {
             break;
             
         case 'contact-details':
-            $personal_phone = sanitize_text_field($_POST['personal_phone']);
+            $user_phone = sanitize_text_field($_POST['user_phone']);
             $mobile = sanitize_text_field($_POST['mobile']);
-            $work_phone = sanitize_text_field($_POST['work_phone']);
+            $user_mobile = sanitize_text_field($_POST['user_mobile']);
             $work_mobile = sanitize_text_field($_POST['work_mobile']);
             $work_email = sanitize_email($_POST['work_email']);
             
@@ -2086,8 +2141,8 @@ function iipm_handle_update_profile() {
                 $wpdb->prefix . 'test_iipm_member_profiles',
                 array(
                     'user_id' => $user_id,
-                    'personal_phone' => $personal_phone,
-                    'work_phone' => $work_phone,
+                    'user_phone' => $user_phone,
+                    'user_mobile' => $user_mobile,
                     'work_mobile' => $work_mobile,
                     'work_email' => $work_email
                 ),
@@ -3132,6 +3187,7 @@ function iipm_handle_enhanced_member_registration_v2() {
     $invitation = null;
     if ($token) {
         $invitation = iipm_validate_invitation_token($token);
+        // echo json_encode($invitation); die();
         if (!$invitation) {
             error_log('IIPM: Invalid invitation token');
             wp_send_json_error('Invalid or expired invitation');
@@ -3731,7 +3787,7 @@ function iipm_calculate_profile_completion($user_id) {
 	$total_fields = 8;
 	
 	if ($user && $user->first_name && $user->last_name) $completion += 2;
-	if ($profile && $profile->personal_phone) $completion += 1;
+	if ($profile && $profile->user_phone) $completion += 1;
 	if ($profile && $profile->work_email) $completion += 1;
 	if ($profile && $profile->employer_name) $completion += 2;
 	if ($member && $member->email_verified) $completion += 2;
@@ -4722,4 +4778,97 @@ add_action('wp_ajax_iipm_check_cpd_return_status', 'iipm_ajax_check_cpd_return_s
 /**
  * Check if CPD tables exist
  */
+
+// AJAX: Search employers from wp_employers (emp_ID, emp_Name)
+function iipm_search_employers_ajax() {
+    global $wpdb;
+
+    $table = $wpdb->prefix . 'employers';
+
+    // Optional filter by q; no pagination
+    $term = isset($_REQUEST['q']) ? trim(wp_unslash($_REQUEST['q'])) : '';
+    $where = '';
+    if ($term !== '') {
+        $like = '%' . $wpdb->esc_like($term) . '%';
+        $where = $wpdb->prepare('WHERE emp_Name LIKE %s', $like);
+    }
+
+    $sql = "SELECT emp_ID, emp_Name FROM {$table} {$where} ORDER BY emp_Name ASC";
+    $rows = $wpdb->get_results($sql);
+
+    $results = array();
+    foreach ((array)$rows as $row) {
+        $results[] = array(
+            'id' => (string) $row->emp_ID,
+            'text' => $row->emp_Name,
+        );
+    }
+
+    wp_send_json(array(
+        'results' => $results
+    ));
+}
+add_action('wp_ajax_iipm_search_employers', 'iipm_search_employers_ajax');
+add_action('wp_ajax_nopriv_iipm_search_employers', 'iipm_search_employers_ajax');
+
+// AJAX: Search organisations for organisation select
+function iipm_search_organisations_ajax() {
+    global $wpdb;
+
+    $table = $wpdb->prefix . 'test_iipm_organisations';
+
+    // Optional filter by q; no pagination
+    $term = isset($_REQUEST['q']) ? trim(wp_unslash($_REQUEST['q'])) : '';
+    $where = '';
+    if ($term !== '') {
+        $like = '%' . $wpdb->esc_like($term) . '%';
+        $where = $wpdb->prepare('WHERE name LIKE %s', $like);
+    }
+
+    $sql = "SELECT id, name FROM {$table} {$where} ORDER BY name ASC";
+    $rows = $wpdb->get_results($sql);
+
+    $results = array();
+    foreach ((array)$rows as $row) {
+        $results[] = array(
+            'id' => (string) $row->id,
+            'text' => $row->name,
+        );
+    }
+
+    wp_send_json(array(
+        'results' => $results
+    ));
+}
+add_action('wp_ajax_iipm_search_organisations', 'iipm_search_organisations_ajax');
+add_action('wp_ajax_nopriv_iipm_search_organisations', 'iipm_search_organisations_ajax');
+
+// AJAX: Get organisation name by ID
+function iipm_get_organisation_name_ajax() {
+    global $wpdb;
+    
+    $organisation_id = isset($_REQUEST['organisation_id']) ? intval($_REQUEST['organisation_id']) : 0;
+    
+    if (!$organisation_id) {
+        wp_send_json_error('Organisation ID is required');
+        return;
+    }
+    
+    $table = $wpdb->prefix . 'test_iipm_organisations';
+    $org = $wpdb->get_row($wpdb->prepare(
+        "SELECT id, name FROM {$table} WHERE id = %d",
+        $organisation_id
+    ));
+    
+    if ($org) {
+        wp_send_json_success(array(
+            'id' => $org->id,
+            'name' => $org->name
+        ));
+    } else {
+        wp_send_json_error('Organisation not found');
+    }
+}
+add_action('wp_ajax_iipm_get_organisation_name', 'iipm_get_organisation_name_ajax');
+add_action('wp_ajax_nopriv_iipm_get_organisation_name', 'iipm_get_organisation_name_ajax');
 
