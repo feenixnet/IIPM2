@@ -982,9 +982,9 @@ function iipm_process_organisation_admin_registration($data, $invitation) {
         $wpdb->prefix . 'test_iipm_member_profiles',
         array(
             'user_id' => $user_id,
-            'personal_phone' => sanitize_text_field($data['personal_phone'] ?? ''),
+            'user_phone' => sanitize_text_field($data['user_phone'] ?? ''),
             'work_email' => sanitize_email($data['work_email'] ?? ''),
-            'work_phone' => sanitize_text_field($data['work_phone'] ?? ''),
+            'user_mobile' => sanitize_text_field($data['user_mobile'] ?? ''),
             'employer_name' => sanitize_text_field($data['employer_name'] ?? '')
         ),
         array('%d', '%s', '%s', '%s', '%s')

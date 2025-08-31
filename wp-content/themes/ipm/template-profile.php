@@ -200,9 +200,9 @@ get_header();
                                         <h4>Personal</h4>
                                         <div class="form-group">
                                             <label>Landline</label>
-                                            <div class="form-value" data-field="personal_phone">
-                                                <?php if ($profile->personal_phone): ?>
-                                                    <?php echo esc_html($profile->personal_phone); ?>
+                                            <div class="form-value" data-field="user_phone">
+                                                <?php if ($profile->user_phone): ?>
+                                                    <?php echo esc_html($profile->user_phone); ?>
                                                 <?php else: ?>
                                                     <span class="placeholder-text">Not provided</span>
                                                 <?php endif; ?>
@@ -227,9 +227,9 @@ get_header();
                                         <h4>Work</h4>
                                         <div class="form-group">
                                             <label>Landline</label>
-                                            <div class="form-value" data-field="work_phone">
-                                                <?php if ($profile->work_phone): ?>
-                                                    <?php echo esc_html($profile->work_phone); ?>
+                                            <div class="form-value" data-field="user_mobile">
+                                                <?php if ($profile->user_mobile): ?>
+                                                    <?php echo esc_html($profile->user_mobile); ?>
                                                 <?php else: ?>
                                                     <span class="placeholder-text">Not provided</span>
                                                 <?php endif; ?>
@@ -264,7 +264,7 @@ get_header();
                                         <h4>Personal</h4>
                                         <div class="form-group">
                                             <label>Landline</label>
-                                            <input type="text" class="form-input" name="personal_phone" value="<?php echo esc_attr($profile->personal_phone); ?>" />
+                                            <input type="text" class="form-input" name="user_phone" value="<?php echo esc_attr($profile->user_phone); ?>" />
                                         </div>
                                         <div class="form-group">
                                             <label>Mobile*</label>
@@ -279,7 +279,7 @@ get_header();
                                         <h4>Work</h4>
                                         <div class="form-group">
                                             <label>Landline</label>
-                                            <input type="text" class="form-input" name="work_phone" value="<?php echo esc_attr($profile->work_phone); ?>" />
+                                            <input type="text" class="form-input" name="user_mobile" value="<?php echo esc_attr($profile->user_mobile); ?>" />
                                         </div>
                                         <div class="form-group">
                                             <label>Mobile</label>

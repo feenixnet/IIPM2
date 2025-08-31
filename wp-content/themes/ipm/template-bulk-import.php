@@ -91,9 +91,9 @@ get_header();
                             <div class="step-content">
                                 <h4>Optional Columns</h4>
                                 <ul class="optional-columns">
-                                    <li>personal_phone</li>
+                                    <li>user_phone</li>
                                     <li>work_email</li>
-                                    <li>work_phone</li>
+                                    <li>user_mobile</li>
                                     <li>employer_name</li>
                                     <li>professional_designation</li>
                                 </ul>

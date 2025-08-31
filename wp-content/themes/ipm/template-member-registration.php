@@ -54,7 +54,7 @@ get_header();
                         
                         <!-- Personal Information Section -->
                         <div class="form-section">
-                            <h3>Personal Information</h3>
+                            <h3>Your Information</h3>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="first_name">First Name *</label>
@@ -65,6 +65,11 @@ get_header();
                                     <label for="last_name">Last Name *</label>
                                     <input type="text" name="last_name" id="last_name" required>
                                 </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login_name">Login Name</label>
+                                <input type="text" name="login_name" id="login_name" required>
                             </div>
                             
                             <div class="form-group">
@@ -106,9 +111,14 @@ get_header();
                         <div class="form-section">
                             <h3>Contact Information</h3>
                             <div class="form-group">
-                                <label for="personal_phone">Personal Phone</label>
-                                <input type="tel" name="personal_phone" id="personal_phone">
+                                <label for="user_phone">User Phone</label>
+                                <input type="tel" name="user_phone" id="user_phone">
                             </div>
+
+                            <div class="form-group">
+                                    <label for="user_mobile">User Mobile</label>
+                                    <input type="tel" name="user_mobile" id="user_mobile">
+                                </div>
                             
                             <div class="form-group">
                                 <label for="address">Full Address *</label>
@@ -120,26 +130,10 @@ get_header();
                         <!-- Professional Information Section -->
                         <div class="form-section">
                             <h3>Professional Information</h3>
-                            <div class="form-group">
-                                <label for="employer_name">Employer/Organisation</label>
-                                <input type="text" name="employer_name" id="employer_name">
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="work_email">Work Email</label>
-                                    <input type="email" name="work_email" id="work_email">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="work_phone">Work Phone</label>
-                                    <input type="tel" name="work_phone" id="work_phone">
-                                </div>
-                            </div>
                             
                             <div class="form-group">
-                                <label for="professional_designation">Professional Designation</label>
-                                <input type="text" name="professional_designation" id="professional_designation" 
+                                <label for="user_designation">User Designation</label>
+                                <input type="text" name="user_designation" id="user_designation" 
                                        placeholder="e.g., QFA, CPA, etc.">
                             </div>
                             
@@ -149,28 +143,107 @@ get_header();
                                           placeholder="Please include other accreditations and date obtained (e.g., QFA 15.06.2012)"></textarea>
                             </div>
                         </div>
+
+                        <div class="form-section">
+                            <h3>Billing Address</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="postal_address">Postal Address</label>
+                                    <input type="address" name="postal_address" id="postal_address">
+                                </div>
+                                <div class="form-group">
+                                    <label for="city_or_town">City or Town</label>
+                                    <input type="text" name="city_or_town" id="city_or_town">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line_1">Address Line 1</label>
+                                <input type="address" name="address_line_1" id="address_line_1">
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line_2">Address Line 2</label>
+                                <input type="address" name="address_line_2" id="address_line_2">
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line_3">Address Line 3</label>
+                                <input type="address" name="address_line_3" id="address_line_3">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Additional Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="payment_method">Payment Method</label>
+                                    <select name="payment_method" id="payment_method">
+                                        <option value="">Select payment method</option>
+                                        <option value="Direct Invoiced">Direct Invoiced</option>
+                                        <option value="Not Invoiced">Not Invoiced</option>
+                                        <option value="NA">NA</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eircode_p">Personal Eircode</label>
+                                    <input type="text" name="eircode_p" id="eircode_p">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="eircode_w">Work Eircode</label>
+                                    <input type="text" name="eircode_w" id="eircode_w">
+                                </div>
+                                <div class="form-group">
+                                    <label for="correspondence_email">Correspondence Email</label>
+                                    <input type="email" name="correspondence_email" id="correspondence_email">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user_notes">User Notes</label>
+                                <textarea name="user_notes" id="user_notes" rows="3" placeholder="Additional notes about the user"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3>Personal Information (optional)</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email_address_pers">Personal Email Address</label>
+                                    <input type="email" name="email_address_pers" id="email_address_pers">
+                                </div>
+                                <div class="form-group">
+                                    <label for="user_phone_pers">Personal Phone</label>
+                                    <input type="tel" name="user_phone_pers" id="user_phone_pers">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="user_mobile_pers">Personal Mobile</label>
+                                    <input type="tel" name="user_mobile_pers" id="user_mobile_pers">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Address_1_pers">Personal Address Line 1</label>
+                                    <input type="address" name="Address_1_pers" id="Address_1_pers">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="Address_2_pers">Personal Address Line 2</label>
+                                <input type="address" name="Address_2_pers" id="Address_2_pers">
+                            </div>
+                            <div class="form-group">
+                                <label for="Address_3_pers">Personal Address Line 3</label>
+                                <input type="address" name="Address_3_pers" id="Address_3_pers">
+                            </div>
+                        </div>
                         
                         <!-- Organisation Section (conditional) -->
                         <div class="form-section organisation-section" style="display:none;">
                             <h3>Organisation Information</h3>
                             <div class="form-group">
-                                <label for="organisation_id">Select Organisation</label>
-                                <select name="organisation_id" id="organisation_id" <?php echo ($invitation && $invitation->organisation_id) ? 'disabled' : ''; ?>>
-                                    <option value="">Choose your organisation</option>
-                                    <?php
-                                    global $wpdb;
-                                    $organisations = $wpdb->get_results("SELECT id, name FROM {$wpdb->prefix}test_iipm_organisations WHERE is_active = 1 ORDER BY name");
-                                    foreach ($organisations as $org) {
-                                        $selected = ($invitation && $invitation->organisation_id == $org->id) ? 'selected' : '';
-                                        echo "<option value='{$org->id}' {$selected}>" . esc_html($org->name) . "</option>";
-                                    }
-                                    ?>
-                                </select>
-                                <?php if ($invitation && $invitation->organisation_id): ?>
-                                    <input type="hidden" name="organisation_id" value="<?php echo esc_attr($invitation->organisation_id); ?>">
-                                <?php endif; ?>
-                                <small>Don't see your organisation? Contact us at info@iipm.ie</small>
+                                <label for="organisation_name">Organisation</label>
+                                <input type="text" name="organisation_name" id="organisation_name" value="Loading..." readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                                <input type="hidden" name="organisation_id" id="organisation_id" value="<?php echo ($invitation && $invitation->organisation_id) ? esc_attr($invitation->organisation_id) : ''; ?>">
                             </div>
+                            <small>Organisation information is pre-filled from your invitation</small>
                         </div>
                         
                         <!-- Privacy & Consent Section -->
@@ -374,6 +447,7 @@ jQuery(document).ready(function($) {
     var $form = $('#iipm-member-registration-form');
     if ($form.length) {
         // Remove any existing handlers first
+
         $form.off('submit');
         
         // Prevent any default form submission
@@ -517,6 +591,13 @@ jQuery(document).ready(function($) {
             'address': 'Address'
         };
         
+        // Validate login_name length if provided
+        var loginName = $form.find('input[name="login_name"]').val();
+        if (loginName && loginName.trim().length < 2) {
+            errors.push('Login Name must be at least 2 characters long');
+            $form.find('input[name="login_name"]').addClass('error');
+        }
+        
         Object.keys(requiredFields).forEach(function(field) {
             var $field = $form.find('[name="' + field + '"]');
             var value = $field.val();
@@ -598,6 +679,21 @@ jQuery(document).ready(function($) {
         // If validation passes, prepare form data
         var formData = new FormData(this);
         formData.append('action', 'iipm_register_member');
+
+        // If employer is not selected, do not send employer fields
+        var employerIdVal = ($('#employer_select').val() || '').trim();
+        if (!employerIdVal) {
+            formData.delete('employer_id');
+            formData.delete('employer_name');
+        }
+        
+        // Organisation fields are always sent if they exist (from invitation)
+        var organisationId = $('#organisation_id').val();
+        var organisationName = $('#organisation_name').val();
+        if (organisationId && organisationName) {
+            formData.set('organisation_id', organisationId);
+            formData.set('organisation_name', organisationName);
+        }
         
         // Show loading state
         $submitBtn.addClass('loading');
@@ -837,6 +933,68 @@ jQuery(document).ready(function($) {
         if (successElement) {
             observer.observe(successElement, { attributes: true, attributeFilter: ['style'] });
         }
+    }
+});
+
+// Populate employer select with all employers (single request) and handle selection
+jQuery(document).ready(function($){
+    // var $sel = $('#employer_select');
+    // if (!$sel.length) return;
+
+    // // Show loading placeholder
+    // $sel.html('<option value="" disabled selected>Loading...</option>');
+
+    // $.ajax({
+    //     url: (typeof iipm_ajax !== 'undefined' ? iipm_ajax.ajax_url : '<?php echo admin_url('admin-ajax.php'); ?>'),
+    //     type: 'POST',
+    //     dataType: 'json',
+    //     data: {
+    //         action: 'iipm_search_employers',
+    //         nonce: (typeof iipm_ajax !== 'undefined' ? iipm_ajax.nonce : '<?php echo wp_create_nonce('iipm_portal_nonce'); ?>')
+    //     }
+    // }).done(function(resp){
+    //     var items = (resp && resp.results) ? resp.results : [];
+    //     var opts = ['<option value="">Select employer</option>'];
+    //     items.forEach(function(it){
+    //         opts.push('<option value="' + it.id + '">' + $('<div>').text(it.text || '').html() + '</option>');
+    //     });
+    //     $sel.html(opts.join(''));
+    // }).fail(function(){
+    //     // keep empty on error
+    // });
+
+    // $sel.on('change', function(){
+    //     var $opt = $(this).find('option:selected');
+    //     var val = ($opt.val() || '').trim();
+    //     if (!val) {
+    //         $('#employer_name').val('');
+    //     } else {
+    //         $('#employer_name').val($opt.text() || '');
+    //     }
+    // });
+    
+    // Fetch organisation name if invitation has organisation_id
+    var invitationOrgId = <?php echo ($invitation && $invitation->organisation_id) ? $invitation->organisation_id : 'null'; ?>;
+    console.log("WWWWWWWWWWWWWW", invitationOrgId);
+    if (invitationOrgId) {
+        $.ajax({
+            url: (typeof iipm_ajax !== 'undefined' ? iipm_ajax.ajax_url : '<?php echo admin_url('admin-ajax.php'); ?>'),
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'iipm_get_organisation_name',
+                organisation_id: invitationOrgId,
+                nonce: (typeof iipm_ajax !== 'undefined' ? iipm_ajax.nonce : '<?php echo wp_create_nonce('iipm_portal_nonce'); ?>')
+            }
+        }).done(function(resp){
+            if (resp && resp.success && resp.data && resp.data.name) {
+                $('#organisation_name').val(resp.data.name);
+            } else {
+                $('#organisation_name').val('Organisation not found');
+            }
+        }).fail(function(){
+            $('#organisation_name').val('Error loading organisation');
+        });
     }
 });
 
