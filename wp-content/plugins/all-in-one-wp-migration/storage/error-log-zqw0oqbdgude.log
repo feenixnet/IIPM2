@@ -1,0 +1,3 @@
+Aug 27 2025 05:30:34
+{"type":8192,"message":"Automatic conversion of false to array is deprecated","file":"C:\\xampp\\htdocs\\new-iipm\\wp-content\\plugins\\cm-download-manager\\lib\\models\\Labels.php","line":119}
+

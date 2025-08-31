@@ -1,0 +1,27 @@
+// table names related to user table
+
+wp_woocommerce_payment_tokens
+wp_woocommerce_downloadable_product_permissions
+wp_woocommerce_api_keys
+wp_wc_webhooks
+wp_wc_download_log
+wp_wc_customer_lookup
+wp_vehiclePAw
+wp_site_name
+wp_pro_rata_meta
+wp_msAccessOld
+wp_memsUploadBuffer
+wp_memberAttachements
+wp_gf_entry_notes
+wp_fullCPD_confirmations_Del
+wp_fullCPD_confirmations
+wp_directInvoicingOldRcds
+wp_DesignationByUser2020
+wp_crsUploadBuffer
+wp_CrsCompleted_byUsers_del
+wp_crscompleted_byusers
+wp_CoursesByAdminWrongIndex
+wp_CoursesByAdminLive
+wp_CoursesByAdminBku
+wp_comments
+

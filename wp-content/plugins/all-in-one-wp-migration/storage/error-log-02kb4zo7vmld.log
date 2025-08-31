@@ -1,0 +1,3 @@
+Aug 26 2025 15:40:31
+{"Number":2,"Message":"fopen(C:xampptmpphp483.tmp): Failed to open stream: No such file or directory","File":"C:\\xampp\\htdocs\\new-iipm\\wp-content\\plugins\\all-in-one-wp-migration\\functions.php","Line":1819}
+

@@ -1,0 +1,6 @@
+Aug 26 2025 13:35:51
+{"Number":2,"Message":"rmdir(C:\\xampp\\htdocs\\new-iipm\\wp-content\\plugins\\all-in-one-wp-migration\\storage\\o4r8tg616nc0): Directory not empty","File":"C:\\xampp\\htdocs\\new-iipm\\wp-content\\plugins\\all-in-one-wp-migration\\lib\\vendor\\servmask\\filesystem\\class-ai1wm-directory.php","Line":74}
+
+Aug 26 2025 13:35:52
+{"Number":2,"Message":"filesize(): stat failed for C:\\xampp\\htdocs\\new-iipm\\wp-content\\plugins\\all-in-one-wp-migration\\storage\\o4r8tg616nc0\\localhost-new-iipm-20250826-133545-io17nu4riy8v.wpress","File":"C:\\xampp\\htdocs\\new-iipm\\wp-content\\plugins\\all-in-one-wp-migration\\lib\\vendor\\servmask\\archiver\\class-ai1wm-archiver.php","Line":233}
+

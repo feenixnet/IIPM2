@@ -1,0 +1,6 @@
+first_name,last_name,email,member_type,personal_phone,work_email,work_phone,employer_name,professional_designation
+John,Doe,john.doe@company.com,organisation,+353 87 123 4567,john.doe@work.com,+353 1 234 5678,Sample Company Ltd,QFA
+Jane,Smith,jane.smith@company.com,organisation,+353 87 234 5678,jane.smith@work.com,+353 1 345 6789,Sample Company Ltd,CPA
+Michael,Johnson,michael.johnson@company.com,organisation,+353 87 345 6789,michael.johnson@work.com,+353 1 456 7890,Sample Company Ltd,ACCA
+Sarah,Williams,sarah.williams@company.com,organisation,+353 87 456 7890,sarah.williams@work.com,+353 1 567 8901,Sample Company Ltd,QFA
+David,Brown,david.brown@company.com,organisation,+353 87 567 8901,david.brown@work.com,+353 1 678 9012,Sample Company Ltd,
